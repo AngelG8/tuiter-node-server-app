@@ -1,32 +1,33 @@
 import * as usersDao from "./users-dao.js";
 
+var currentUserVar;
 const AuthController = (app) => {
-    const register = (req, res) => {
+    const register = async (req, res) => {
         const username = req.body.username;
-        const user = usersDao.findUserByUsername(username);
+        const user = await usersDao.findUserByUsername(username);
         if (user) {
             res.sendStatus(409);
             return;
         }
-        const newUser = usersDao.createUser(req.body);
-        req.session["currentUser"] = newUser;
+        const newUser = await usersDao.createUser(req.body);
+        currentUserVar = newUser;
         res.json(newUser);
     };
 
-    const login = (req, res) => {
+    const login = async (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
-        const user = usersDao.findUserByCredentials(username, password);
+        const user = await usersDao.findUserByCredentials(username, password);
         if (user) {
-            req.session["currentUser"] = user;
+            currentUserVar = user;
             res.json(user);
         } else {
             res.sendStatus(404);
         }
     };
 
-    const profile = (req, res) => {
-        const currentUser = req.session["currentUser"];
+    const profile = async (req, res) => {
+        const currentUser = currentUserVar
         if (!currentUser) {
             res.sendStatus(404);
             return;
@@ -39,7 +40,21 @@ const AuthController = (app) => {
         res.sendStatus(200);
     };
 
-    const update = (req, res) => { };
+    const update = async (req, res) => {
+        try {
+            const updates = req.body;
+            const uid = currentUserVar._id;
+            const updatedUser = await usersDao.updateUser(uid, updates);
+            if (!updatedUser) {
+                res.sendStatus(404);
+            }
+            currentUserVar = updatedUser;
+            res.json(updatedUser);
+        } catch (e) {
+            console.error("error updating:", error);
+            return null;
+        }
+    }
 
     app.post("/api/users/register", register);
     app.post("/api/users/login", login);
