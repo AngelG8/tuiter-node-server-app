@@ -14,12 +14,6 @@ app.use(
         saveUninitialized: true,
     })
 );
-app.use(
-    cors({
-        credentials: true,
-        origin: "http://localhost:3000",
-    })
-)
 app.use((req, res, next) => {
     const allowedOrigins = ["http://localhost:3000", "https://a5--clinquant-kitten-7de83c.netlify.app"];
     const origin = req.headers.origin;
