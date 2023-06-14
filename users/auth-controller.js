@@ -37,6 +37,7 @@ const AuthController = (app) => {
 
     const logout = async (req, res) => {
         req.session.destroy();
+        currentUserVar = null;
         res.sendStatus(200);
     };
 
