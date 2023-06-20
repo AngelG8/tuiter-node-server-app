@@ -9,9 +9,9 @@ const createTuit = async (req, res) => {
 }
 
 const findTuits = async (req, res) => {
-    const tuits = await tuitsDao.findTuits();
+    const tuits = await tuitsDao.findTuits()
     res.json(tuits);
-};
+}
 
 const updateTuit = async (req, res) => {
     const tuitdIdToUpdate = req.params.tid;
@@ -19,6 +19,7 @@ const updateTuit = async (req, res) => {
     const status = await tuitsDao.updateTuit(tuitdIdToUpdate, updates);
     res.json(status);
 }
+
 const deleteTuit = async (req, res) => {
     const tuitdIdToDelete = req.params.tid;
     const status = await tuitsDao.deleteTuit(tuitdIdToDelete);

@@ -1,51 +1,53 @@
 import * as usersDao from "./users-dao.js";
 
-var currentUserVar;
 const AuthController = (app) => {
     const register = async (req, res) => {
-        const username = req.body.username;
-        const user = await usersDao.findUserByUsername(username);
+        const user = await usersDao.findUserByUsername(req.body.username);
         if (user) {
             res.sendStatus(409);
             return;
         }
         const newUser = await usersDao.createUser(req.body);
-        currentUserVar = newUser;
+        req.session["currentUser"] = newUser;
         res.json(newUser);
     };
 
     const login = async (req, res) => {
         const username = req.body.username;
         const password = req.body.password;
-        const user = await usersDao.findUserByCredentials(username, password);
-        if (user) {
-            currentUserVar = user;
-            res.json(user);
+        if (username && password) {
+            const user = await usersDao.findUserByCredentials(username, password);
+            if (user) {
+                req.session["currentUser"] = user;
+                res.json(user);
+            } else {
+                res.sendStatus(403);
+            }
         } else {
-            res.sendStatus(404);
+            res.sendStatus(403);
         }
     };
 
-    const profile = async (req, res) => {
-        const currentUser = currentUserVar
-        if (!currentUser) {
-            res.sendStatus(404);
-            return;
+    const profile = (req, res) => {
+        const currentUser = req.session["currentUser"];
+        if (currentUser) {
+            res.json(currentUser);
+        } else {
+            res.sendStatus(403);
         }
-        res.json(currentUser);
     };
 
-    const logout = async (req, res) => {
+    const logout = (req, res) => {
         req.session.destroy();
-        currentUserVar = null;
         res.sendStatus(200);
     };
 
     const update = async (req, res) => {
+        const currentUser = req.session["currentUser"];
         const updates = req.body;
-        const uid = currentUserVar._id;
+        const uid = currentUser._id;
         const updatedUser = await usersDao.updateUser(uid, updates);
-        currentUserVar = updatedUser;
+        req.session["currentUser"] = updatedUser;
         res.json(updatedUser);
     }
 
@@ -53,6 +55,7 @@ const AuthController = (app) => {
     app.post("/api/users/login", login);
     app.post("/api/users/profile", profile);
     app.post("/api/users/logout", logout);
-    app.put("/api/users/", update);
+    app.put("/api/users", update);
 };
+
 export default AuthController;
