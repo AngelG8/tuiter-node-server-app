@@ -36,7 +36,7 @@ app.use(
 );
 
 app.use((req, res, next) => {
-    const allowedOrigins = ["http://localhost:3000", "https://a5--clinquant-kitten-7de83c.netlify.app"];
+    const allowedOrigins = ["http://localhost:3000", "https://a5--clinquant-kitten-7de83c.netlify.app", "https://a6--clinquant-kitten-7de83c.netlify.app"];
     const origin = req.headers.origin;
 
     if (allowedOrigins.includes(origin)) {
