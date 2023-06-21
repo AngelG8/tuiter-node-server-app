@@ -2,15 +2,7 @@ import * as tuitsDao from './tuits-dao.js'
 
 const createTuit = async (req, res) => {
     const newTuit = req.body;
-    newTuit.topic = "Generic"
-    newTuit.time = "0m"
-    newTuit.image = "blahaj-face.jpg"
-    newTuit.liked = false;
-    newTuit.disliked = false;
-    newTuit.likes = 0;
-    newTuit.dislikes = 0;
-    newTuit.replies = 0;
-    newTuit.retuits = 0;
+    newTuit.username = req.session["currentUser"]
     const insertedTuit = await tuitsDao.createTuit(newTuit);
     res.json(insertedTuit);
 }
